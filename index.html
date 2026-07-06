@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agora · 认知议会 · 决策审议系统</title>
+<title>Agora · 众辩思议 · A Forum of Claims</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,13 +17,12 @@
     <div class="sidebar-logo">
       <div class="logo-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M8 12c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
         </svg>
       </div>
-      <span class="sidebar-brand">Agora</span>
+      <span class="sidebar-brand">Entelecheia</span>
     </div>
     <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -31,31 +30,31 @@
       </svg>
     </button>
   </div>
+
   <nav class="sidebar-nav">
-    <a href="#" class="nav-item active" data-page="workbench">
+    <a href="#" class="nav-item active" data-page="home">
       <span class="nav-icon">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
       </span>
-      <span class="nav-label">工作台</span>
+      <span class="nav-label">主页</span>
     </a>
-    <a href="#" class="nav-item" data-page="reviewing">
+    <a href="#" class="nav-item" data-page="reports">
       <span class="nav-icon">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
           <line x1="16" y1="13" x2="8" y2="13"/>
           <line x1="16" y1="17" x2="8" y2="17"/>
         </svg>
       </span>
-      <span class="nav-label">审议中</span>
-      <span class="nav-badge" id="reviewBadge">12</span>
+      <span class="nav-label">报告</span>
     </a>
-    <a href="#" class="nav-item" data-page="council">
+    <a href="#" class="nav-item" data-page="forest">
       <span class="nav-icon">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"/>
           <circle cx="12" cy="4" r="2"/>
           <circle cx="20" cy="12" r="2"/>
@@ -67,11 +66,11 @@
           <line x1="6" y1="12" x2="9" y2="12"/>
         </svg>
       </span>
-      <span class="nav-label">议会视图</span>
+      <span class="nav-label">知识森林</span>
     </a>
     <a href="#" class="nav-item" data-page="knowledge">
       <span class="nav-icon">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <ellipse cx="12" cy="5" rx="9" ry="3"/>
           <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
           <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
@@ -79,651 +78,466 @@
       </span>
       <span class="nav-label">知识库</span>
     </a>
-    <a href="#" class="nav-item" data-page="records">
-      <span class="nav-icon">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 20h9"/>
-          <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-      </span>
-      <span class="nav-label">记录</span>
-    </a>
-    <a href="#" class="nav-item settings-item" data-page="settings">
-      <span class="nav-icon">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-        </svg>
-      </span>
-      <span class="nav-label">设置</span>
-    </a>
   </nav>
+
   <div class="sidebar-footer">
     <div class="user-info">
-      <div class="user-avatar">A</div>
-      <span class="user-name">Agora 团队</span>
-      <svg class="user-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="6 9 12 15 18 9"/>
-      </svg>
+      <div class="user-avatar" id="userAvatar">Y</div>
+      <div class="user-details">
+        <span class="user-name">Yolanda</span>
+        <span class="user-email">zhangyanziv@hkgai.org</span>
+      </div>
     </div>
   </div>
 </aside>
 
 <!-- 主内容区 -->
 <main class="main-content" id="mainContent">
-  <!-- 顶部 Header -->
-  <header class="top-header">
-    <div class="header-center">
-      <h1 class="brand-title">Agora</h1>
-      <p class="brand-subtitle">认知议会 · 决策审议系统</p>
-    </div>
-    <div class="header-right">
-      <div class="status-indicator">
-        <span class="status-dot"></span>
-        <span class="status-text" id="headerStatus">12 正在审议</span>
-      </div>
-      <button class="icon-btn notification-btn">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 01-3.46 0"/>
-        </svg>
-      </button>
+
+  <!-- 顶部 Logo 区域 -->
+  <header class="agora-header">
+    <div class="agora-header-inner">
+      <h1 class="agora-title">Agora</h1>
+      <p class="agora-subtitle">众辩思议 · <span class="subtitle-en">A FORUM OF CLAIMS</span></p>
     </div>
   </header>
 
-  <!-- 工作区 -->
-  <div class="workspace">
-    <!-- 左+中间区域 -->
-    <div class="workspace-main">
+  <!-- Agent 社会网络主视觉区 -->
+  <div class="network-stage" id="networkStage">
 
-      <!-- 输入区 -->
-      <section class="input-section card">
-        <h2 class="input-title">提交一个需要被审议的重大判断</h2>
-        <div class="input-wrapper">
-          <textarea
-            class="judgment-input"
-            id="judgmentInput"
-            placeholder="例如：请站在外部投资人角度，判断 HKGAI 是否值得投资或战略合作？"
-            maxlength="500"
-          >HKGAI 是否值得外部投资或战略合作？</textarea>
-          <div class="char-count"><span id="charCount">21</span>/500</div>
+    <!-- SVG 连线层 -->
+    <svg class="flow-lines-svg" id="flowLinesSvg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow-filter">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="pulse-filter">
+          <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- 专家节点容器 -->
+    <div class="agents-layer" id="agentsLayer">
+
+      <!-- 专家节点 (由 JS 动态定位) -->
+      <div class="agent-node" id="agent-industry" data-id="industry" data-angle="310" data-r-ratio="0.37">
+        <div class="agent-avatar" style="--avatar-hue: 220">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-industry)"/>
+            <defs><radialGradient id="grad-industry" cx="30%" cy="25%"><stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#1d4ed8"/></radialGradient></defs>
+            <path d="M12 28V16l8-4 8 4v12" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M16 28v-6h8v6" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="20" cy="14" r="2" fill="white" opacity="0.8"/>
+          </svg>
         </div>
-        <div class="input-actions" style="margin-bottom: 0;">
-          <div class="action-buttons">
-            <button class="action-btn" id="autoGroupBtn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                <path d="M16 3.13a4 4 0 010 7.75"/>
-              </svg>
-              自动编组
-            </button>
-            <button class="action-btn" id="manualSelectBtn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-              手动选择
-            </button>
-            <button class="action-btn" id="uploadBtn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-              上传资料
-            </button>
-            <button class="action-btn" id="knowledgeBtn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="agent-info">
+          <span class="agent-name">行业研究员</span>
+          <span class="agent-role">Industry Analyst</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">行业研究员</div>
+          <div class="tooltip-desc">深度行业洞察，识别市场格局与竞争动态</div>
+          <div class="tooltip-tags">
+            <span class="tag">行业分析</span>
+            <span class="tag">竞争格局</span>
+            <span class="tag">市场规模</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-valuation" data-id="valuation" data-angle="350" data-r-ratio="0.34">
+        <div class="agent-avatar" style="--avatar-hue: 260">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-valuation)"/>
+            <defs><radialGradient id="grad-valuation" cx="30%" cy="25%"><stop offset="0%" stop-color="#c4b5fd"/><stop offset="100%" stop-color="#6d28d9"/></radialGradient></defs>
+            <path d="M10 30l5-8 5 4 5-10 5 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="12" r="3" stroke="white" stroke-width="1.5"/>
+            <line x1="20" y1="9" x2="20" y2="7" stroke="white" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">估值分析师</span>
+          <span class="agent-role">Valuation Expert</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">估值分析师</div>
+          <div class="tooltip-desc">财务建模与估值，DCF、可比公司分析</div>
+          <div class="tooltip-tags">
+            <span class="tag">财务建模</span>
+            <span class="tag">DCF估值</span>
+            <span class="tag">倍数分析</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-risk" data-id="risk" data-angle="15" data-r-ratio="0.36">
+        <div class="agent-avatar" style="--avatar-hue: 0">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-risk)"/>
+            <defs><radialGradient id="grad-risk" cx="30%" cy="25%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="100%" stop-color="#991b1b"/></radialGradient></defs>
+            <path d="M20 10l8 14H12l8-14z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+            <line x1="20" y1="16" x2="20" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="20" cy="23" r="1" fill="white"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">风险控制官</span>
+          <span class="agent-role">Risk Officer</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">风险控制官</div>
+          <div class="tooltip-desc">识别关键风险因子，评估风险触发条件与影响</div>
+          <div class="tooltip-tags">
+            <span class="tag">风险识别</span>
+            <span class="tag">压力测试</span>
+            <span class="tag">情景分析</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-opposition" data-id="opposition" data-angle="50" data-r-ratio="0.33">
+        <div class="agent-avatar" style="--avatar-hue: 30">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-opposition)"/>
+            <defs><radialGradient id="grad-opposition" cx="30%" cy="25%"><stop offset="0%" stop-color="#fdba74"/><stop offset="100%" stop-color="#c2410c"/></radialGradient></defs>
+            <path d="M14 14l12 12M26 14L14 26" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="20" cy="20" r="8" stroke="white" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">反方挑战者</span>
+          <span class="agent-role">Devil's Advocate</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">反方挑战者</div>
+          <div class="tooltip-desc">提出最强反对论点，挑战假设前提与逻辑链</div>
+          <div class="tooltip-tags">
+            <span class="tag">反驳论点</span>
+            <span class="tag">假设挑战</span>
+            <span class="tag">逻辑审查</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-macro" data-id="macro" data-angle="90" data-r-ratio="0.38">
+        <div class="agent-avatar" style="--avatar-hue: 180">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-macro)"/>
+            <defs><radialGradient id="grad-macro" cx="30%" cy="25%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#065f46"/></radialGradient></defs>
+            <circle cx="20" cy="20" r="8" stroke="white" stroke-width="1.5"/>
+            <line x1="12" y1="20" x2="28" y2="20" stroke="white" stroke-width="1.2"/>
+            <path d="M20 12a12 12 0 014 8 12 12 0 01-4 8 12 12 0 01-4-8 12 12 0 014-8z" stroke="white" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">宏观策略师</span>
+          <span class="agent-role">Macro Strategist</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">宏观策略师</div>
+          <div class="tooltip-desc">宏观经济与政策研判，全球视野下的战略定位</div>
+          <div class="tooltip-tags">
+            <span class="tag">宏观经济</span>
+            <span class="tag">政策分析</span>
+            <span class="tag">全球视野</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-finance" data-id="finance" data-angle="145" data-r-ratio="0.35">
+        <div class="agent-avatar" style="--avatar-hue: 200">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-finance)"/>
+            <defs><radialGradient id="grad-finance" cx="30%" cy="25%"><stop offset="0%" stop-color="#7dd3fc"/><stop offset="100%" stop-color="#0c4a6e"/></radialGradient></defs>
+            <path d="M20 10v20M15 14h7.5a2.5 2.5 0 010 5H15M15 19h8a2.5 2.5 0 010 5H15" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">财务尽调专家</span>
+          <span class="agent-role">Financial Due Diligence</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">财务尽调专家</div>
+          <div class="tooltip-desc">财务数据深度审查，识别会计异常与资金风险</div>
+          <div class="tooltip-tags">
+            <span class="tag">财务审查</span>
+            <span class="tag">现金流分析</span>
+            <span class="tag">异常识别</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-legal" data-id="legal" data-angle="195" data-r-ratio="0.36">
+        <div class="agent-avatar" style="--avatar-hue: 240">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-legal)"/>
+            <defs><radialGradient id="grad-legal" cx="30%" cy="25%"><stop offset="0%" stop-color="#a5b4fc"/><stop offset="100%" stop-color="#312e81"/></radialGradient></defs>
+            <path d="M20 10v20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 14l-4 8h8l-4-8z" stroke="white" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M26 14l-4 8h8l-4-8z" stroke="white" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">法律合规顾问</span>
+          <span class="agent-role">Legal Compliance</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">法律合规顾问</div>
+          <div class="tooltip-desc">法律风险识别，监管合规审查与合同条款分析</div>
+          <div class="tooltip-tags">
+            <span class="tag">法律风险</span>
+            <span class="tag">合规审查</span>
+            <span class="tag">监管政策</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node" id="agent-sentiment" data-id="sentiment" data-angle="240" data-r-ratio="0.34">
+        <div class="agent-avatar" style="--avatar-hue: 160">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-sentiment)"/>
+            <defs><radialGradient id="grad-sentiment" cx="30%" cy="25%"><stop offset="0%" stop-color="#86efac"/><stop offset="100%" stop-color="#14532d"/></radialGradient></defs>
+            <circle cx="20" cy="20" r="7" stroke="white" stroke-width="1.5"/>
+            <path d="M16 22c1 2 6 2 8 0" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="17" cy="18" r="1.2" fill="white"/>
+            <circle cx="23" cy="18" r="1.2" fill="white"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">市场情绪观察员</span>
+          <span class="agent-role">Sentiment Analyst</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">市场情绪观察员</div>
+          <div class="tooltip-desc">市场情绪与舆论分析，捕捉非理性因素与叙事</div>
+          <div class="tooltip-tags">
+            <span class="tag">情绪分析</span>
+            <span class="tag">舆论监测</span>
+            <span class="tag">叙事追踪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 潜伏席位 (弱化) -->
+      <div class="agent-node latent" id="agent-tech" data-id="tech" data-angle="270" data-r-ratio="0.37">
+        <div class="agent-avatar" style="--avatar-hue: 210">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-tech)"/>
+            <defs><radialGradient id="grad-tech" cx="30%" cy="25%"><stop offset="0%" stop-color="#bae6fd"/><stop offset="100%" stop-color="#0369a1"/></radialGradient></defs>
+            <polyline points="14 18 8 24 14 30" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,-4)"/>
+            <polyline points="26 18 32 24 26 30" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(-8,-4)"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">技术趋势专家</span>
+          <span class="agent-role">Tech Trends</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">技术趋势专家</div>
+          <div class="tooltip-desc">技术路线评估，前沿趋势与技术壁垒分析</div>
+          <div class="tooltip-tags">
+            <span class="tag">技术评估</span>
+            <span class="tag">趋势研判</span>
+            <span class="tag">壁垒分析</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node latent" id="agent-chair" data-id="chair" data-angle="125" data-r-ratio="0.41">
+        <div class="agent-avatar" style="--avatar-hue: 280">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-chair)"/>
+            <defs><radialGradient id="grad-chair" cx="30%" cy="25%"><stop offset="0%" stop-color="#d8b4fe"/><stop offset="100%" stop-color="#581c87"/></radialGradient></defs>
+            <path d="M20 10l2.47 5.01L28 15.9l-4 3.9.94 5.5L20 22.77l-4.94 2.6.94-5.5-4-3.9 5.53-.89L20 10z" stroke="white" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">投委会主席</span>
+          <span class="agent-role">IC Chairman</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">投委会主席视角</div>
+          <div class="tooltip-desc">综合审议，最终决策框架与投资委员会视角</div>
+          <div class="tooltip-tags">
+            <span class="tag">综合判断</span>
+            <span class="tag">决策框架</span>
+            <span class="tag">投委视角</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node latent" id="agent-supply" data-id="supply" data-angle="355" data-r-ratio="0.41">
+        <div class="agent-avatar" style="--avatar-hue: 150">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-supply)"/>
+            <defs><radialGradient id="grad-supply" cx="30%" cy="25%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs>
+            <path d="M8 20h4l3-6 6 12 3-6h4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">供应链专家</span>
+          <span class="agent-role">Supply Chain</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">供应链专家</div>
+          <div class="tooltip-desc">供应链韧性评估，产业链上下游关系分析</div>
+          <div class="tooltip-tags">
+            <span class="tag">供应链</span>
+            <span class="tag">产业链</span>
+            <span class="tag">韧性评估</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-node latent" id="agent-policy" data-id="policy" data-angle="170" data-r-ratio="0.41">
+        <div class="agent-avatar" style="--avatar-hue: 50">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="20" fill="url(#grad-policy)"/>
+            <defs><radialGradient id="grad-policy" cx="30%" cy="25%"><stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs>
+            <rect x="10" y="12" width="20" height="16" rx="2" stroke="white" stroke-width="1.5"/>
+            <line x1="14" y1="17" x2="26" y2="17" stroke="white" stroke-width="1.2"/>
+            <line x1="14" y1="21" x2="22" y2="21" stroke="white" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="agent-info">
+          <span class="agent-name">政策研究员</span>
+          <span class="agent-role">Policy Researcher</span>
+        </div>
+        <div class="agent-halo"></div>
+        <div class="agent-tooltip">
+          <div class="tooltip-name">政策研究员</div>
+          <div class="tooltip-desc">政策环境解读，监管趋势与政府关系分析</div>
+          <div class="tooltip-tags">
+            <span class="tag">政策解读</span>
+            <span class="tag">监管趋势</span>
+            <span class="tag">政府关系</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /agents-layer -->
+
+    <!-- 审议中枢 -->
+    <div class="inquiry-chamber" id="inquiryChamber">
+      <div class="chamber-glow-ring"></div>
+      <div class="chamber-inner">
+
+        <!-- 审议者徽章 -->
+        <div class="deliberator-badge">
+          <div class="deliberator-avatar" id="deliberatorAvatar">Y</div>
+          <span class="deliberator-label">今日之问 · INQUIRY OF THE DAY</span>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="chamber-input-wrap">
+          <textarea
+            class="chamber-textarea"
+            id="chamberInput"
+            placeholder="输入你的问题，召集专家开始审议…"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
+
+        <!-- 控制栏 -->
+        <div class="chamber-controls">
+          <div class="controls-left">
+            <!-- 模式切换 -->
+            <div class="mode-toggle">
+              <button class="mode-btn active" id="modeAuto" data-mode="auto">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                自动
+              </button>
+              <button class="mode-btn" id="modeManual" data-mode="manual">手动</button>
+            </div>
+
+            <!-- 深度模式 -->
+            <div class="depth-wrapper">
+              <button class="depth-btn" id="depthBtn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span id="depthLabel">深度模式</span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+              <div class="depth-dropdown" id="depthDropdown">
+                <div class="depth-option" data-value="quick">
+                  <div class="depth-name">快速审议</div>
+                  <div class="depth-desc">核心观点 · 主要风险 · 初步建议</div>
+                </div>
+                <div class="depth-option active" data-value="deep">
+                  <div class="depth-name">深度审议</div>
+                  <div class="depth-desc">反方质询 · 推翻条件 · 完整证据链</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 知识库 -->
+            <button class="ctrl-btn" id="knowledgeBtn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <ellipse cx="12" cy="5" rx="9" ry="3"/>
                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
                 <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
               </svg>
-              指定知识库
+              知识库
             </button>
-            <div class="intensity-wrapper">
-              <button class="action-btn intensity-btn" id="intensityBtn">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
-                <span id="intensityLabel">审议强度：深度审议</span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="6 9 12 15 18 9"/>
-                </svg>
-              </button>
-              <div class="intensity-dropdown" id="intensityDropdown">
-                <div class="intensity-option" data-value="quick">
-                  <div class="intensity-name">快速审议</div>
-                  <div class="intensity-desc">初步建议、核心理由、主要风险、证据摘要</div>
-                </div>
-                <div class="intensity-option active" data-value="deep">
-                  <div class="intensity-name">深度审议</div>
-                  <div class="intensity-desc">反方质询、推翻条件、风险触发、完整证据链</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button class="submit-btn" id="submitBtn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polygon points="5 3 19 12 5 21 5 3"/>
-            </svg>
-            提交审议
-          </button>
-        </div>
-        <div class="submit-hint">系统将生成最大反方、推翻条件、证据链与可归档的决策记录。</div>
-        <!-- 信息来源 -->
-        <div class="source-info" id="sourceInfo" style="display:none">
-          <span class="source-label">本次信息来源：</span>
-          <span class="source-content" id="sourceContent"></span>
-        </div>
-        <!-- 自动编组提示 -->
-        <div class="group-hint" id="groupHint" style="display:none">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span id="groupHintText">已自动编组 11 个审议席位 · 匹配依据：外部投资 / 战略合作 / 商业化验证 / 技术壁垒 / 风险识别</span>
-        </div>
-      </section>
 
-      <!-- 认知议会节点网络 -->
-      <section class="council-section">
-        <canvas class="council-bg-canvas" id="councilBgCanvas"></canvas>
-        <div class="council-canvas" id="councilCanvas">
-          <!-- SVG 连线层 -->
-          <svg class="connections-svg" id="connectionsSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-
-          <!-- 中心节点 -->
-          <div class="center-node" id="centerNode">
-            <div class="center-halo"></div>
-            <div class="center-node-inner">
-              <div class="center-label-row">
-                <span class="center-label">待审判断</span>
-              </div>
-              <div class="center-sublabel" id="centerSublabel">问题核心</div>
-              <div class="center-content" id="centerContent">HKGAI 是否值得外部投资或战略合作？</div>
-              <div class="center-status" id="centerStatus" style="display:none">审议中</div>
-            </div>
-          </div>
-
-          <!-- 核心席位 (第一层) -->
-          <!-- 主审席 top -->
-          <div class="seat core-seat" id="seat-chief" data-seat="chief" data-angle="270" data-r="175">
-            <div class="seat-icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <!-- 本地材料 -->
+            <button class="ctrl-btn" id="uploadBtn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
-            </div>
-            <div class="seat-name">主审席</div>
-            <div class="seat-desc">统筹与裁决</div>
-            <div class="seat-status" id="status-chief">待命</div>
+              本地材料
+            </button>
           </div>
 
-          <!-- 证据席 bottom-left -->
-          <div class="seat core-seat" id="seat-evidence" data-seat="evidence" data-angle="210" data-r="175">
-            <div class="seat-icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
+          <div class="controls-right">
+            <!-- 已选专家数 (手动模式) -->
+            <div class="selected-count" id="selectedCount" style="display:none">
+              已选 <span id="selectedNum">0</span> 位专家
             </div>
-            <div class="seat-name">证据席</div>
-            <div class="seat-desc">检索与验证</div>
-            <div class="seat-status" id="status-evidence">待命</div>
-          </div>
-
-          <!-- 反方席 bottom-right -->
-          <div class="seat core-seat" id="seat-opposition" data-seat="opposition" data-angle="330" data-r="175">
-            <div class="seat-icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <!-- 开始审议 -->
+            <button class="start-btn" id="startBtn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="5 3 19 12 5 21 5 3"/>
               </svg>
-            </div>
-            <div class="seat-name">反方席</div>
-            <div class="seat-desc">最强反对观点</div>
-            <div class="seat-status" id="status-opposition">待命</div>
-          </div>
-
-          <!-- 风险席 top-right -->
-          <div class="seat core-seat" id="seat-risk" data-seat="risk" data-angle="30" data-r="175">
-            <div class="seat-icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-            </div>
-            <div class="seat-name">风险席</div>
-            <div class="seat-desc">识别关键风险</div>
-            <div class="seat-status" id="status-risk">待命</div>
-          </div>
-
-          <!-- 假设席 top-left -->
-          <div class="seat core-seat" id="seat-assumption" data-seat="assumption" data-angle="150" data-r="175">
-            <div class="seat-icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-            </div>
-            <div class="seat-name">假设席</div>
-            <div class="seat-desc">核心假设审查</div>
-            <div class="seat-status" id="status-assumption">待命</div>
-          </div>
-
-          <!-- 记录席 bottom -->
-          <div class="seat core-seat" id="seat-record" data-seat="record" data-angle="90" data-r="175">
-            <div class="seat-icon-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-              </svg>
-            </div>
-            <div class="seat-name">记录席</div>
-            <div class="seat-desc">记录与沉淀</div>
-            <div class="seat-status" id="status-record">待命</div>
-          </div>
-
-          <!-- 领域专家席位 (第二层) -->
-          <div class="seat expert-seat inactive" id="seat-market" data-seat="market" data-angle="240" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-            <div class="seat-name">市场席</div>
-            <div class="seat-desc">市场与竞争</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-finance" data-seat="finance" data-angle="200" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="1" x2="12" y2="23"/>
-                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-              </svg>
-            </div>
-            <div class="seat-name">财务席</div>
-            <div class="seat-desc">财务与估值</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-tech" data-seat="tech" data-angle="160" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16 18 22 12 16 6"/>
-                <polyline points="8 6 2 12 8 18"/>
-              </svg>
-            </div>
-            <div class="seat-name">技术席</div>
-            <div class="seat-desc">技术与产品</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-legal" data-seat="legal" data-angle="340" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/>
-              </svg>
-            </div>
-            <div class="seat-name">法律席</div>
-            <div class="seat-desc">合规与法律</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-macro" data-seat="macro" data-angle="20" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-              </svg>
-            </div>
-            <div class="seat-name">宏观席</div>
-            <div class="seat-desc">宏观与政策</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-esg" data-seat="esg" data-angle="60" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22V12M12 12C12 12 7 9 7 4a5 5 0 0110 0c0 5-5 8-5 8z"/>
-              </svg>
-            </div>
-            <div class="seat-name">ESG席</div>
-            <div class="seat-desc">ESG·可持续</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-team" data-seat="team" data-angle="120" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                <path d="M16 3.13a4 4 0 010 7.75"/>
-              </svg>
-            </div>
-            <div class="seat-name">团队席</div>
-            <div class="seat-desc">团队与治理</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-quant" data-seat="quant" data-angle="280" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="2" width="20" height="20" rx="2"/>
-                <path d="M7 13l3 3 7-7"/>
-              </svg>
-            </div>
-            <div class="seat-name">量化席</div>
-            <div class="seat-desc">量化分析</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-reverse" data-seat="reverse" data-angle="300" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="1 4 1 10 7 10"/>
-                <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
-              </svg>
-            </div>
-            <div class="seat-name">逆向席</div>
-            <div class="seat-desc">逆向分析</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-emotion" data-seat="emotion" data-angle="80" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                <line x1="9" y1="9" x2="9.01" y2="9"/>
-                <line x1="15" y1="9" x2="15.01" y2="9"/>
-              </svg>
-            </div>
-            <div class="seat-name">情绪席</div>
-            <div class="seat-desc">市场情绪</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-deal" data-seat="deal" data-angle="180" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-              </svg>
-            </div>
-            <div class="seat-name">交易结构席</div>
-            <div class="seat-desc">交易结构</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-ma" data-seat="ma" data-angle="140" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-              </svg>
-            </div>
-            <div class="seat-name">并购席</div>
-            <div class="seat-desc">并购咨询</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-chain" data-seat="chain" data-angle="100" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-              </svg>
-            </div>
-            <div class="seat-name">链上席</div>
-            <div class="seat-desc">链上分析</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-opportunity" data-seat="opportunity" data-angle="40" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="16"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-            </div>
-            <div class="seat-name">机会席</div>
-            <div class="seat-desc">机会识别</div>
-          </div>
-
-          <div class="seat expert-seat inactive" id="seat-host" data-seat="host" data-angle="220" data-r="295">
-            <div class="seat-icon-wrap sm">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-              </svg>
-            </div>
-            <div class="seat-name">主持席</div>
-            <div class="seat-desc">议程控制</div>
+              开始审议
+            </button>
           </div>
         </div>
-      </section>
 
-      <!-- 底部近期审议案例 -->
-      <section class="cases-section card">
-        <h3 class="cases-title">近期审议案例</h3>
-        <div class="cases-table-wrapper">
-          <table class="cases-table">
-            <thead>
-              <tr>
-                <th>议题</th>
-                <th>最终判断</th>
-                <th>最大反方摘要</th>
-                <th>证据链</th>
-                <th>更新时间</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="case-row">
-                <td>
-                  <div class="case-title-cell">
-                    <span class="case-icon-dot blue"></span>
-                    HKGAI 是否值得外部投资或战略合作?
-                  </div>
-                </td>
-                <td><span class="verdict-tag green">战略合作优先</span> <span class="confidence">谨慎财务投资</span></td>
-                <td class="case-desc">商业化能力尚未验证，更像政府资助型研发平台。</td>
-                <td class="evidence-cell">公开 12 ｜ 内部 4 ｜ 待验证 5</td>
-                <td class="time-cell">2 分钟前</td>
-                <td><button class="row-arrow">›</button></td>
-              </tr>
-              <tr class="case-row">
-                <td>
-                  <div class="case-title-cell">
-                    <span class="case-icon-dot blue"></span>
-                    中港科技股配置策略（2025Q2）
-                  </div>
-                </td>
-                <td><span class="verdict-tag green">分批进场</span> <span class="confidence">信心：中</span></td>
-                <td class="case-desc">流动性修复不持续，贸易摩擦压制估值修复空间。</td>
-                <td class="evidence-cell">公开 18 ｜ 内部 6 ｜ 待验证 7</td>
-                <td class="time-cell">23 小时前</td>
-                <td><button class="row-arrow">›</button></td>
-              </tr>
-              <tr class="case-row">
-                <td>
-                  <div class="case-title-cell">
-                    <span class="case-icon-dot blue"></span>
-                    黄金持仓策略：长期配置比例建议
-                  </div>
-                </td>
-                <td><span class="verdict-tag orange">保留核心仓位</span> <span class="confidence">信心：中</span></td>
-                <td class="case-desc">实际利率上行压制金价，中期需关注美元走势。</td>
-                <td class="evidence-cell">公开 10 ｜ 内部 3 ｜ 待验证 4</td>
-                <td class="time-cell">2 天前</td>
-                <td><button class="row-arrow">›</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+      </div><!-- /chamber-inner -->
+    </div><!-- /inquiry-chamber -->
 
-    <!-- 右侧审议账本 -->
-    <aside class="ledger-panel" id="ledgerPanel">
-      <div class="ledger-header">
-        <div>
-          <h3 class="ledger-title">审议账本</h3>
-          <div class="ledger-subtitle">实时追踪最大反方、推翻条件、证据链与决策记录</div>
-        </div>
-        <button class="icon-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
-          </svg>
-        </button>
-      </div>
+  </div><!-- /network-stage -->
 
-      <!-- 最大反方 -->
-      <div class="ledger-item">
-        <div class="ledger-item-header">
-          <div class="ledger-icon red">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <span class="ledger-item-title">最大反方</span>
-          <span class="ledger-tag red" id="tag-opposition">待识别</span>
-        </div>
-        <div class="ledger-item-body" id="body-opposition">
-          <span class="ledger-placeholder">系统将自动识别最强反对观点</span>
-        </div>
-      </div>
-
-      <!-- 推翻条件 -->
-      <div class="ledger-item">
-        <div class="ledger-item-header">
-          <div class="ledger-icon orange">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </div>
-          <span class="ledger-item-title">推翻条件</span>
-          <span class="ledger-tag orange" id="tag-condition">待生成</span>
-        </div>
-        <div class="ledger-item-body" id="body-condition">
-          <span class="ledger-placeholder">推翻当前判断所需的关键条件</span>
-        </div>
-      </div>
-
-      <!-- 证据链 -->
-      <div class="ledger-item">
-        <div class="ledger-item-header">
-          <div class="ledger-icon blue">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-            </svg>
-          </div>
-          <span class="ledger-item-title">证据链</span>
-          <span class="ledger-tag blue" id="tag-evidence">待建立</span>
-        </div>
-        <div class="ledger-item-body" id="body-evidence">
-          <span class="ledger-placeholder">证据收集与验证进度</span>
-        </div>
-      </div>
-
-      <!-- 信息来源 -->
-      <div class="ledger-item">
-        <div class="ledger-item-header">
-          <div class="ledger-icon green">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <ellipse cx="12" cy="5" rx="9" ry="3"/>
-              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-            </svg>
-          </div>
-          <span class="ledger-item-title">信息来源</span>
-          <span class="ledger-tag green" id="tag-source">未配置</span>
-        </div>
-        <div class="ledger-item-body" id="body-source">
-          <span class="ledger-placeholder">公开资料（默认）</span>
-        </div>
-      </div>
-
-      <!-- 决策记录 -->
-      <div class="ledger-item">
-        <div class="ledger-item-header">
-          <div class="ledger-icon purple">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-          </div>
-          <span class="ledger-item-title">决策记录</span>
-          <span class="ledger-tag purple" id="tag-decision">未归档</span>
-        </div>
-        <div class="ledger-item-body" id="body-decision">
-          <span class="ledger-placeholder">审议完成后自动生成归档记录</span>
-        </div>
-      </div>
-    </aside>
-  </div>
 </main>
-
-<!-- 手动选择抽屉 -->
-<div class="drawer-overlay" id="drawerOverlay"></div>
-<div class="drawer" id="manualDrawer">
-  <div class="drawer-header">
-    <h3>选择审议席位</h3>
-    <button class="drawer-close" id="drawerClose">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-  <div class="drawer-body">
-    <div class="expert-list" id="expertList"></div>
-  </div>
-  <div class="drawer-footer">
-    <div class="drawer-count">已启用 <span id="drawerCount">6</span> 个审议席位</div>
-    <button class="submit-btn small" id="confirmGroupBtn">确认编组</button>
-  </div>
-</div>
-
-<!-- 上传资料面板 -->
-<div class="modal-overlay" id="uploadOverlay"></div>
-<div class="modal-panel" id="uploadPanel">
-  <div class="modal-header">
-    <h3>添加本次审议材料</h3>
-    <button class="modal-close" id="uploadClose">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="upload-area">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-        <polyline points="17 8 12 3 7 8"/>
-        <line x1="12" y1="3" x2="12" y2="15"/>
-      </svg>
-      <p>拖拽文件至此或点击选择</p>
-    </div>
-    <div class="file-list">
-      <div class="file-item">
-        <div class="file-info">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-          <span>HKGAI BP.pdf</span>
-        </div>
-        <button class="file-add-btn" data-file="HKGAI BP.pdf">添加</button>
-      </div>
-      <div class="file-item">
-        <div class="file-info">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-          <span>客户POC反馈汇总.docx</span>
-        </div>
-        <button class="file-add-btn" data-file="客户POC反馈汇总.docx">添加</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- 知识库面板 -->
 <div class="modal-overlay" id="knowledgeOverlay"></div>
@@ -731,7 +545,7 @@
   <div class="modal-header">
     <h3>指定知识库</h3>
     <button class="modal-close" id="knowledgeClose">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"/>
         <line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
@@ -771,7 +585,53 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="submit-btn small" id="confirmKbBtn">确认选择</button>
+    <button class="modal-confirm-btn" id="confirmKbBtn">确认选择</button>
+  </div>
+</div>
+
+<!-- 上传材料面板 -->
+<div class="modal-overlay" id="uploadOverlay"></div>
+<div class="modal-panel" id="uploadPanel">
+  <div class="modal-header">
+    <h3>添加本次审议材料</h3>
+    <button class="modal-close" id="uploadClose">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="upload-area">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <p>拖拽文件至此或点击选择</p>
+    </div>
+    <div class="file-list">
+      <div class="file-item">
+        <div class="file-info">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>HKGAI BP.pdf</span>
+        </div>
+        <button class="file-add-btn">添加</button>
+      </div>
+      <div class="file-item">
+        <div class="file-info">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>客户POC反馈汇总.docx</span>
+        </div>
+        <button class="file-add-btn">添加</button>
+      </div>
+    </div>
   </div>
 </div>
 

@@ -1,68 +1,103 @@
-/* ===== Agora Decision Review System ===== */
+/* ============================================================
+   Agora · app.js
+   Agent 社会网络 · 审议中枢 · 五状态交互系统
+   ============================================================ */
 
-// ===== State =====
+'use strict';
+
+// ── State ──────────────────────────────────────────────────
 const state = {
+  mode: 'auto',           // 'auto' | 'manual'
+  depth: 'deep',          // 'quick' | 'deep'
+  pageState: 'idle',      // 'idle' | 'typing' | 'recommended' | 'manual' | 'launching'
+  selectedAgents: new Set(),
+  recommendedAgents: new Set(),
   sidebarCollapsed: false,
-  uploadedFiles: [],
-  selectedKBs: ['公开资料库'],
-  activeSeats: new Set(['chief', 'evidence', 'opposition', 'risk', 'assumption', 'record']),
-  isReviewing: false,
-  intensity: 'deep',
+  idlePulseTimer: null,
+  flowAnimTimers: [],
 };
 
-const CORE_SEATS = ['chief', 'evidence', 'opposition', 'risk', 'assumption', 'record'];
-const AUTO_GROUP_EXTRA = ['market', 'finance', 'tech', 'team', 'reverse'];
-
-const EXPERT_SEATS = [
-  { id: 'market',      name: '市场分析师',     role: '市场席 · 市场与竞争分析' },
-  { id: 'finance',     name: '财务专家',       role: '财务席 · 财务建模与估值' },
-  { id: 'team',        name: '团队评估师',     role: '团队席 · 团队与治理' },
-  { id: 'risk_expert', name: '风险评估师',     role: '风险席 · 风险管理', seatId: 'risk' },
-  { id: 'tech',        name: '技术专家',       role: '技术席 · 技术与产品' },
-  { id: 'legal',       name: '法律顾问',       role: '法律席 · 合规与法律' },
-  { id: 'quant',       name: '量化分析师',     role: '量化席 · 技术面与量化分析' },
-  { id: 'macro',       name: '宏观经济分析师', role: '宏观席 · 宏观与政策' },
-  { id: 'esg',         name: 'ESG分析师',      role: 'ESG席 · ESG评估' },
-  { id: 'emotion',     name: '情绪分析师',     role: '情绪席 · 市场情绪' },
-  { id: 'deal',        name: '交易结构师',     role: '交易结构席 · 交易结构' },
-  { id: 'ma',          name: '并购顾问',       role: '并购席 · 并购咨询' },
-  { id: 'chain',       name: '链上分析师',     role: '链上席 · 链上分析' },
-  { id: 'reverse',     name: '逆向分析师',     role: '逆向席 · 逆向分析 / 反方挑战' },
-  { id: 'opportunity', name: '机会发现者',     role: '机会席 · 机会识别' },
-  { id: 'host',        name: '讨论主持人',     role: '主持席 · 议程控制与结论收敛' },
+// ── Expert Data ────────────────────────────────────────────
+const EXPERTS = [
+  { id: 'industry',   name: '行业研究员',   role: 'Industry Analyst',     primary: true  },
+  { id: 'valuation',  name: '估值分析师',   role: 'Valuation Expert',     primary: true  },
+  { id: 'risk',       name: '风险控制官',   role: 'Risk Officer',         primary: true  },
+  { id: 'opposition', name: '反方挑战者',   role: "Devil's Advocate",     primary: true  },
+  { id: 'macro',      name: '宏观策略师',   role: 'Macro Strategist',     primary: true  },
+  { id: 'finance',    name: '财务尽调专家', role: 'Financial Due Diligence', primary: true },
+  { id: 'legal',      name: '法律合规顾问', role: 'Legal Compliance',     primary: true  },
+  { id: 'sentiment',  name: '市场情绪观察员', role: 'Sentiment Analyst',  primary: true  },
+  { id: 'tech',       name: '技术趋势专家', role: 'Tech Trends',          primary: false },
+  { id: 'chair',      name: '投委会主席',   role: 'IC Chairman',          primary: false },
+  { id: 'supply',     name: '供应链专家',   role: 'Supply Chain',         primary: false },
+  { id: 'policy',     name: '政策研究员',   role: 'Policy Researcher',    primary: false },
 ];
 
-// ===== Helpers =====
+// Auto-recommend mapping (keyword → agent ids)
+const AUTO_RECOMMEND_MAP = [
+  { keywords: ['投资', '融资', '估值', '股权', '上市', 'ipo'],
+    agents: ['valuation', 'finance', 'risk', 'opposition', 'macro', 'legal'] },
+  { keywords: ['技术', '产品', '研发', 'ai', '算法', '模型'],
+    agents: ['tech', 'industry', 'risk', 'opposition', 'finance'] },
+  { keywords: ['市场', '竞争', '用户', '增长', '营销'],
+    agents: ['industry', 'sentiment', 'macro', 'opposition', 'valuation'] },
+  { keywords: ['风险', '合规', '法律', '监管', '政策'],
+    agents: ['legal', 'risk', 'policy', 'macro', 'opposition'] },
+  { keywords: ['供应链', '制造', '物流', '采购'],
+    agents: ['supply', 'risk', 'macro', 'finance', 'industry'] },
+];
+
+// ── Helpers ────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const $$ = sel => document.querySelectorAll(sel);
+const svgNS = 'http://www.w3.org/2000/svg';
+const makeSVG = tag => document.createElementNS(svgNS, tag);
 
-// ===== Init =====
+function showToast(msg, duration = 2200) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ── Init ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initSidebar();
-  initInput();
-  positionSeats();
-  drawConnections();
-  initActionButtons();
-  initDrawer();
-  initModals();
   initNavItems();
-  buildExpertList();
-  window.addEventListener('resize', () => {
-    positionSeats();
-    setTimeout(drawConnections, 50);
-  });
+  positionAgents();
+  drawBaseLines();
+  initChamber();
+  initModeToggle();
+  initDepthDropdown();
+  initModals();
+  initStartBtn();
+  startIdleAnimation();
+
+  window.addEventListener('resize', debounce(() => {
+    positionAgents();
+    drawBaseLines();
+    if (state.pageState === 'recommended') drawRecommendLines();
+    if (state.pageState === 'manual') drawSelectedLines();
+  }, 120));
 });
 
-// ===== Sidebar =====
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+// ── Sidebar ────────────────────────────────────────────────
 function initSidebar() {
   $('sidebarToggle').addEventListener('click', () => {
     state.sidebarCollapsed = !state.sidebarCollapsed;
     $('sidebar').classList.toggle('collapsed', state.sidebarCollapsed);
-    setTimeout(drawConnections, 300);
+    setTimeout(() => {
+      positionAgents();
+      drawBaseLines();
+    }, 310);
   });
 }
 
-// ===== Nav =====
 function initNavItems() {
   $$('.nav-item').forEach(item => {
     item.addEventListener('click', e => {
@@ -73,363 +108,630 @@ function initNavItems() {
   });
 }
 
-// ===== Input Sync =====
-function initInput() {
-  const input = $('judgmentInput');
-  const charCount = $('charCount');
-  const centerContent = $('centerContent');
-  const centerNode = $('centerNode');
-  const centerSublabel = $('centerSublabel');
-
-  function sync() {
-    const val = input.value.trim();
-    charCount.textContent = input.value.length;
-    if (val) {
-      centerContent.textContent = val;
-      centerSublabel.textContent = '问题核心';
-      centerNode.classList.add('glowing');
-      input.classList.add('glowing');
-    } else {
-      centerContent.textContent = '等待输入';
-      centerSublabel.textContent = '待审判断';
-      centerNode.classList.remove('glowing');
-      input.classList.remove('glowing');
-    }
-  }
-
-  input.addEventListener('input', sync);
-  sync();
+// ── Agent Positioning ──────────────────────────────────────
+function getStageRect() {
+  return $('networkStage').getBoundingClientRect();
 }
 
-// ===== Seat Positioning =====
-function positionSeats() {
-  const canvas = $('councilCanvas');
-  if (!canvas) return;
-  const W = canvas.offsetWidth;
-  const H = canvas.offsetHeight;
+function positionAgents() {
+  const stage = $('networkStage');
+  const W = stage.offsetWidth;
+  const H = stage.offsetHeight;
   const cx = W / 2;
   const cy = H / 2;
 
-  $$('.seat').forEach(seat => {
-    const angleDeg = parseFloat(seat.dataset.angle || 0);
-    const r = parseFloat(seat.dataset.r || 170);
-    // Standard math: 0=right, 90=up, 270=down in screen coords
-    // We want 270deg = top of screen, so angle 270 => y decreases
-    const rad = (angleDeg * Math.PI) / 180;
+  // Semi-structured offsets for organic social distribution feel
+  const LAYOUT_OFFSETS = {
+    industry:   { dr: 18,   da: 3   },
+    valuation:  { dr: -10,  da: -6  },
+    risk:       { dr: 14,   da: 5   },
+    opposition: { dr: -8,   da: -8  },
+    macro:      { dr: 20,   da: 4   },
+    finance:    { dr: -14,  da: 6   },
+    legal:      { dr: 10,   da: -4  },
+    sentiment:  { dr: -12,  da: 7   },
+    tech:       { dr: 16,   da: -3  },
+    chair:      { dr: -18,  da: 5   },
+    supply:     { dr: 12,   da: -6  },
+    policy:     { dr: -8,   da: 4   },
+  };
+
+  $$('.agent-node').forEach(node => {
+    const id = node.dataset.id;
+    const angleDeg = parseFloat(node.dataset.angle || 0);
+    const rRatio = parseFloat(node.dataset.rRatio || 0.32);
+    const offset = LAYOUT_OFFSETS[id] || { dr: 0, da: 0 };
+
+    const baseR = Math.min(W, H) * rRatio;
+    const r = baseR + offset.dr;
+    const rad = ((angleDeg + offset.da) * Math.PI) / 180;
+
     const x = cx + Math.cos(rad) * r;
-    const y = cy - Math.sin(rad) * r; // flip y for screen
-    seat.style.left = x + 'px';
-    seat.style.top = y + 'px';
-    seat.style.transform = 'translate(-50%, -50%)';
+    const y = cy - Math.sin(rad) * r;
+
+    node.style.left = x + 'px';
+    node.style.top  = y + 'px';
   });
 }
 
-// ===== SVG Connections =====
-function drawConnections() {
-  const svg = $('connectionsSvg');
-  const canvas = $('councilCanvas');
-  const centerEl = $('centerNode');
-  if (!svg || !canvas || !centerEl) return;
+// ── SVG Line Drawing ───────────────────────────────────────
+function clearSVG() {
+  const svg = $('flowLinesSvg');
+  // Keep defs
+  while (svg.lastChild && svg.lastChild.tagName !== 'defs') {
+    svg.removeChild(svg.lastChild);
+  }
+}
 
-  const cRect = canvas.getBoundingClientRect();
-  const nRect = centerEl.getBoundingClientRect();
-  const cx = nRect.left - cRect.left + nRect.width / 2;
-  const cy = nRect.top - cRect.top + nRect.height / 2;
+function getAgentCenter(id) {
+  const node = $('agent-' + id);
+  if (!node) return null;
+  const stage = $('networkStage');
+  const sr = stage.getBoundingClientRect();
+  const nr = node.getBoundingClientRect();
+  return {
+    x: nr.left - sr.left + nr.width / 2,
+    y: nr.top  - sr.top  + nr.height / 2,
+  };
+}
 
-  // Clear
-  while (svg.firstChild) svg.removeChild(svg.firstChild);
+function getChamberCenter() {
+  const chamber = $('inquiryChamber');
+  const stage   = $('networkStage');
+  const cr = chamber.getBoundingClientRect();
+  const sr = stage.getBoundingClientRect();
+  return {
+    x: cr.left - sr.left + cr.width / 2,
+    y: cr.top  - sr.top  + cr.height / 2,
+  };
+}
 
-  // Defs
-  const defs = makeSVGEl('defs');
-  // Animated dash style
-  const style = makeSVGEl('style');
-  style.textContent = `
-    .conn-line { stroke-dasharray: 5 5; animation: dashAnim 2s linear infinite; }
-    @keyframes dashAnim { to { stroke-dashoffset: -20; } }
-    .conn-line-active { stroke-dasharray: 5 5; animation: dashAnim 1.5s linear infinite; }
-  `;
-  defs.appendChild(style);
-  svg.appendChild(defs);
+// Draw base structural lines (very faint, always present)
+function drawBaseLines() {
+  const svg = $('flowLinesSvg');
+  clearSVG();
 
-  $$('.seat').forEach(seat => {
-    const seatId = seat.dataset.seat;
-    const isActive = state.activeSeats.has(seatId);
-    if (!isActive) return;
+  const pairs = [
+    ['industry', 'valuation'],
+    ['valuation', 'risk'],
+    ['risk', 'opposition'],
+    ['opposition', 'macro'],
+    ['macro', 'finance'],
+    ['finance', 'legal'],
+    ['legal', 'sentiment'],
+    ['sentiment', 'industry'],
+    ['industry', 'risk'],
+    ['valuation', 'opposition'],
+    ['macro', 'risk'],
+    ['finance', 'valuation'],
+    ['legal', 'risk'],
+    ['tech', 'industry'],
+    ['chair', 'valuation'],
+    ['supply', 'macro'],
+    ['policy', 'legal'],
+  ];
 
-    const sRect = seat.getBoundingClientRect();
-    const sx = sRect.left - cRect.left + sRect.width / 2;
-    const sy = sRect.top - cRect.top + sRect.height / 2;
+  pairs.forEach(([a, b]) => {
+    const pa = getAgentCenter(a);
+    const pb = getAgentCenter(b);
+    if (!pa || !pb) return;
 
-    const isCore = seat.classList.contains('core-seat');
-    const line = makeSVGEl('line');
-    line.setAttribute('x1', cx);
-    line.setAttribute('y1', cy);
-    line.setAttribute('x2', sx);
-    line.setAttribute('y2', sy);
-    line.setAttribute('stroke', isCore ? 'rgba(59,130,246,0.3)' : 'rgba(59,130,246,0.2)');
-    line.setAttribute('stroke-width', isCore ? '1.5' : '1');
-    line.setAttribute('class', isCore ? 'conn-line-active' : 'conn-line');
+    const line = makeSVG('line');
+    line.setAttribute('x1', pa.x);
+    line.setAttribute('y1', pa.y);
+    line.setAttribute('x2', pb.x);
+    line.setAttribute('y2', pb.y);
+    line.setAttribute('stroke', 'rgba(148,163,184,0.2)');
+    line.setAttribute('stroke-width', '1');
     svg.appendChild(line);
   });
 }
 
-function makeSVGEl(tag) {
-  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+// Draw lines from recommended agents to chamber center
+function drawRecommendLines() {
+  const svg = $('flowLinesSvg');
+  clearSVG();
+  drawBaseLines();
+
+  const cc = getChamberCenter();
+
+  state.recommendedAgents.forEach(id => {
+    const pa = getAgentCenter(id);
+    if (!pa) return;
+
+    // Glow line
+    const lineGlow = makeSVG('line');
+    lineGlow.setAttribute('x1', pa.x); lineGlow.setAttribute('y1', pa.y);
+    lineGlow.setAttribute('x2', cc.x); lineGlow.setAttribute('y2', cc.y);
+    lineGlow.setAttribute('stroke', 'rgba(59,130,246,0.12)');
+    lineGlow.setAttribute('stroke-width', '4');
+    svg.appendChild(lineGlow);
+
+    // Main line
+    const line = makeSVG('line');
+    line.setAttribute('x1', pa.x); line.setAttribute('y1', pa.y);
+    line.setAttribute('x2', cc.x); line.setAttribute('y2', cc.y);
+    line.setAttribute('stroke', 'rgba(59,130,246,0.45)');
+    line.setAttribute('stroke-width', '1.2');
+    line.setAttribute('stroke-dasharray', '4 4');
+    line.style.animation = 'dashFlow 2s linear infinite';
+    svg.appendChild(line);
+  });
+
+  // Lines between recommended agents
+  const recArr = [...state.recommendedAgents];
+  for (let i = 0; i < recArr.length; i++) {
+    for (let j = i + 1; j < recArr.length; j++) {
+      const pa = getAgentCenter(recArr[i]);
+      const pb = getAgentCenter(recArr[j]);
+      if (!pa || !pb) continue;
+      const dist = Math.hypot(pa.x - pb.x, pa.y - pb.y);
+      if (dist > 400) continue; // skip very distant pairs
+
+      const line = makeSVG('line');
+      line.setAttribute('x1', pa.x); line.setAttribute('y1', pa.y);
+      line.setAttribute('x2', pb.x); line.setAttribute('y2', pb.y);
+      line.setAttribute('stroke', 'rgba(59,130,246,0.18)');
+      line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+    }
+  }
+
+  // Inject dash animation
+  injectDashAnimation(svg);
+  spawnPulses(svg, [...state.recommendedAgents], cc);
 }
 
-// ===== Action Buttons =====
-function initActionButtons() {
-  $('autoGroupBtn').addEventListener('click', handleAutoGroup);
-  $('manualSelectBtn').addEventListener('click', openDrawer);
-  $('uploadBtn').addEventListener('click', () => openModal('upload'));
-  $('knowledgeBtn').addEventListener('click', () => openModal('knowledge'));
-  $('submitBtn').addEventListener('click', handleSubmit);
+function drawSelectedLines() {
+  const svg = $('flowLinesSvg');
+  clearSVG();
+  drawBaseLines();
 
-  // Intensity dropdown
-  $('intensityBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    $('intensityDropdown').classList.toggle('show');
+  const cc = getChamberCenter();
+
+  state.selectedAgents.forEach(id => {
+    const pa = getAgentCenter(id);
+    if (!pa) return;
+
+    const lineGlow = makeSVG('line');
+    lineGlow.setAttribute('x1', pa.x); lineGlow.setAttribute('y1', pa.y);
+    lineGlow.setAttribute('x2', cc.x); lineGlow.setAttribute('y2', cc.y);
+    lineGlow.setAttribute('stroke', 'rgba(59,130,246,0.15)');
+    lineGlow.setAttribute('stroke-width', '5');
+    svg.appendChild(lineGlow);
+
+    const line = makeSVG('line');
+    line.setAttribute('x1', pa.x); line.setAttribute('y1', pa.y);
+    line.setAttribute('x2', cc.x); line.setAttribute('y2', cc.y);
+    line.setAttribute('stroke', 'rgba(59,130,246,0.65)');
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('stroke-dasharray', '5 3');
+    line.style.animation = 'dashFlow 1.8s linear infinite';
+    svg.appendChild(line);
   });
 
-  $$('.intensity-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      $$('.intensity-option').forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
-      state.intensity = opt.dataset.value;
-      $('intensityLabel').textContent = '审议强度：' + opt.querySelector('.intensity-name').textContent;
-      $('intensityDropdown').classList.remove('show');
-    });
+  const selArr = [...state.selectedAgents];
+  for (let i = 0; i < selArr.length; i++) {
+    for (let j = i + 1; j < selArr.length; j++) {
+      const pa = getAgentCenter(selArr[i]);
+      const pb = getAgentCenter(selArr[j]);
+      if (!pa || !pb) continue;
+      const dist = Math.hypot(pa.x - pb.x, pa.y - pb.y);
+      if (dist > 350) continue;
+
+      const line = makeSVG('line');
+      line.setAttribute('x1', pa.x); line.setAttribute('y1', pa.y);
+      line.setAttribute('x2', pb.x); line.setAttribute('y2', pb.y);
+      line.setAttribute('stroke', 'rgba(59,130,246,0.22)');
+      line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+    }
+  }
+
+  injectDashAnimation(svg);
+  spawnPulses(svg, [...state.selectedAgents], cc);
+}
+
+function injectDashAnimation(svg) {
+  // dashFlow is defined in style.css — no runtime injection needed
+}
+
+// Spawn animated pulse dots along lines
+function spawnPulses(svg, agentIds, cc) {
+  state.flowAnimTimers.forEach(clearInterval);
+  state.flowAnimTimers = [];
+
+  agentIds.forEach((id, idx) => {
+    const timer = setInterval(() => {
+      const pa = getAgentCenter(id);
+      if (!pa) return;
+      animatePulse(svg, pa, cc);
+    }, 1800 + idx * 400);
+    state.flowAnimTimers.push(timer);
+  });
+}
+
+function animatePulse(svg, from, to) {
+  const dot = makeSVG('circle');
+  dot.setAttribute('r', '3');
+  dot.setAttribute('fill', 'rgba(59,130,246,0.85)');
+  dot.setAttribute('filter', 'url(#pulse-filter)');
+  svg.appendChild(dot);
+
+  const duration = 1200;
+  const start = performance.now();
+
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const x = from.x + (to.x - from.x) * ease;
+    const y = from.y + (to.y - from.y) * ease;
+    const opacity = t < 0.1 ? t / 0.1 : t > 0.85 ? (1 - t) / 0.15 : 1;
+    dot.setAttribute('cx', x);
+    dot.setAttribute('cy', y);
+    dot.setAttribute('opacity', opacity);
+    if (t < 1) requestAnimationFrame(step);
+    else dot.remove();
+  }
+
+  requestAnimationFrame(step);
+}
+
+// ── Idle Animation ─────────────────────────────────────────
+function startIdleAnimation() {
+  const primaryNodes = EXPERTS.filter(e => e.primary).map(e => e.id);
+  let idx = 0;
+
+  function pulse() {
+    // Remove previous pulse
+    $$('.agent-node.idle-pulse').forEach(n => n.classList.remove('idle-pulse'));
+
+    // Pulse 1-2 random nodes
+    const count = Math.random() > 0.5 ? 2 : 1;
+    for (let i = 0; i < count; i++) {
+      const id = primaryNodes[Math.floor(Math.random() * primaryNodes.length)];
+      const node = $('agent-' + id);
+      if (node) node.classList.add('idle-pulse');
+    }
+
+    // Occasional idle flow line
+    if (Math.random() > 0.6) {
+      spawnIdleFlow();
+    }
+  }
+
+  state.idlePulseTimer = setInterval(pulse, 2800);
+  pulse();
+}
+
+function stopIdleAnimation() {
+  clearInterval(state.idlePulseTimer);
+  $$('.agent-node.idle-pulse').forEach(n => n.classList.remove('idle-pulse'));
+  state.flowAnimTimers.forEach(clearInterval);
+  state.flowAnimTimers = [];
+}
+
+function spawnIdleFlow() {
+  if (state.pageState !== 'idle') return;
+  const svg = $('flowLinesSvg');
+  const primaries = EXPERTS.filter(e => e.primary).map(e => e.id);
+  const a = primaries[Math.floor(Math.random() * primaries.length)];
+  let b;
+  do { b = primaries[Math.floor(Math.random() * primaries.length)]; } while (b === a);
+
+  const pa = getAgentCenter(a);
+  const pb = getAgentCenter(b);
+  if (!pa || !pb) return;
+
+  animatePulse(svg, pa, pb);
+}
+
+// ── Chamber / Input ────────────────────────────────────────
+function initChamber() {
+  const textarea = $('chamberInput');
+
+  textarea.addEventListener('focus', () => {
+    if (state.pageState === 'idle') {
+      setPageState('typing');
+    }
   });
 
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.intensity-wrapper')) {
-      $('intensityDropdown').classList.remove('show');
+  textarea.addEventListener('blur', () => {
+    if (state.pageState === 'typing' && !textarea.value.trim()) {
+      setPageState('idle');
+    }
+  });
+
+  let inputTimer = null;
+  textarea.addEventListener('input', () => {
+    const val = textarea.value.trim();
+    if (val && state.mode === 'auto') {
+      clearTimeout(inputTimer);
+      inputTimer = setTimeout(() => autoRecommend(val), 600);
+    } else if (!val && state.pageState !== 'idle') {
+      clearTimeout(inputTimer);
+      setPageState('typing');
     }
   });
 }
 
-// ===== Auto Group =====
-function handleAutoGroup() {
-  if (state.isReviewing) return;
+function setPageState(newState) {
+  const prev = state.pageState;
+  state.pageState = newState;
 
-  // Reset expert seats
-  $$('.expert-seat').forEach(s => {
-    s.classList.remove('active');
-    s.classList.add('inactive');
+  const chamber = $('inquiryChamber');
+
+  switch (newState) {
+    case 'idle':
+      chamber.classList.remove('typing');
+      startIdleAnimation();
+      clearAllHighlights();
+      drawBaseLines();
+      break;
+
+    case 'typing':
+      chamber.classList.add('typing');
+      stopIdleAnimation();
+      clearAllHighlights();
+      drawBaseLines();
+      break;
+
+    case 'recommended':
+      chamber.classList.add('typing');
+      stopIdleAnimation();
+      drawRecommendLines();
+      break;
+
+    case 'manual':
+      chamber.classList.add('typing');
+      stopIdleAnimation();
+      drawSelectedLines();
+      break;
+
+    case 'launching':
+      triggerLaunch();
+      break;
+  }
+}
+
+function clearAllHighlights() {
+  $$('.agent-node').forEach(n => {
+    n.classList.remove('selected', 'recommended');
   });
-  state.activeSeats = new Set(CORE_SEATS);
-  drawConnections();
+  state.selectedAgents.clear();
+  state.recommendedAgents.clear();
+  updateSelectedCount();
+}
 
-  $('autoGroupBtn').classList.add('active');
-  $('manualSelectBtn').classList.remove('active');
+// ── Auto Recommend ─────────────────────────────────────────
+function autoRecommend(text) {
+  if (state.mode !== 'auto') return;
 
-  // Sequentially activate
-  AUTO_GROUP_EXTRA.forEach((seatId, i) => {
-    setTimeout(() => {
-      activateSeat(seatId);
-      if (i === AUTO_GROUP_EXTRA.length - 1) {
-        showGroupHint();
-        updateLedgerAfterGroup();
-        showToast('已自动编组 11 个审议席位', 'blue');
-      }
-    }, (i + 1) * 280);
+  const lower = text.toLowerCase();
+  let matched = new Set();
+
+  AUTO_RECOMMEND_MAP.forEach(rule => {
+    if (rule.keywords.some(kw => lower.includes(kw))) {
+      rule.agents.forEach(id => matched.add(id));
+    }
   });
-}
 
-function activateSeat(seatId) {
-  const seat = $('seat-' + seatId);
-  if (!seat) return;
-  state.activeSeats.add(seatId);
-  seat.classList.remove('inactive');
-  seat.classList.add('active');
-  // Pop animation
-  const origTransform = seat.style.transform;
-  seat.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease';
-  seat.style.opacity = '0';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      seat.style.opacity = '1';
-    });
-  });
-  setTimeout(() => {
-    seat.style.transition = '';
-    drawConnections();
-  }, 450);
-}
-
-function deactivateSeat(seatId) {
-  if (CORE_SEATS.includes(seatId)) return;
-  const seat = $('seat-' + seatId);
-  if (!seat) return;
-  state.activeSeats.delete(seatId);
-  seat.classList.remove('active');
-  seat.classList.add('inactive');
-  drawConnections();
-}
-
-function showGroupHint() {
-  const hint = $('groupHint');
-  hint.style.display = 'flex';
-}
-
-// ===== Submit Review =====
-function handleSubmit() {
-  if (state.isReviewing) return;
-  const val = $('judgmentInput').value.trim();
-  if (!val) {
-    showToast('请先输入需要审议的判断');
-    return;
+  // Default: recommend core experts if no keyword match
+  if (matched.size === 0) {
+    ['industry', 'valuation', 'risk', 'opposition', 'finance', 'macro'].forEach(id => matched.add(id));
   }
 
-  state.isReviewing = true;
-  const btn = $('submitBtn');
-  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 审议进行中...`;
-  btn.classList.add('reviewing');
-  $('headerStatus').textContent = '审议进行中';
+  // Limit to 6
+  const arr = [...matched].slice(0, 6);
+  state.recommendedAgents = new Set(arr);
 
-  // Show center status
-  const cs = $('centerStatus');
-  cs.style.display = 'block';
-  cs.textContent = '审议中';
-
-  // Seat status updates
-  const updates = [
-    { id: 'chief',      text: '统筹中',   cls: 's-analyzing', delay: 350 },
-    { id: 'evidence',   text: '检索中',   cls: 's-searching', delay: 650 },
-    { id: 'opposition', text: '发现冲突', cls: 's-conflict',  delay: 950 },
-    { id: 'risk',       text: '分析中',   cls: 's-analyzing', delay: 1250 },
-    { id: 'assumption', text: '拆解中',   cls: 's-analyzing', delay: 1550 },
-    { id: 'record',     text: '记录中',   cls: 's-recording', delay: 1850 },
-  ];
-
-  updates.forEach(({ id, text, cls, delay }) => {
-    setTimeout(() => {
-      const el = $('status-' + id);
-      if (el) { el.textContent = text; el.className = 'seat-status ' + cls; }
-      const seat = $('seat-' + id);
-      if (seat) seat.classList.add('working');
-    }, delay);
+  // Update visual
+  $$('.agent-node').forEach(n => n.classList.remove('recommended'));
+  arr.forEach(id => {
+    const node = $('agent-' + id);
+    if (node) node.classList.add('recommended');
   });
 
-  setTimeout(updateLedgerDuring, 900);
-  setTimeout(updateLedgerAfter, 2800);
-
-  setTimeout(() => {
-    state.isReviewing = false;
-    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 审议完成`;
-    btn.classList.remove('reviewing');
-    btn.classList.add('done');
-    cs.textContent = '已形成初步审议结果';
-    $('headerStatus').textContent = '13 正在审议';
-    showToast('已形成初步审议结果', 'green');
-  }, 3600);
+  setPageState('recommended');
 }
 
-// ===== Ledger =====
-function setLedger(key, tagText, tagColor, html) {
-  const tag = $('tag-' + key);
-  const body = $('body-' + key);
-  if (tag) { tag.textContent = tagText; tag.className = 'ledger-tag ' + tagColor; }
-  if (body) body.innerHTML = html;
-}
+// ── Mode Toggle ────────────────────────────────────────────
+function initModeToggle() {
+  $$('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      if (mode === state.mode) return;
 
-function updateLedgerAfterGroup() {
-  setLedger('opposition', '待质询', 'red', '<span class="ledger-placeholder">席位已就绪，等待审议启动</span>');
-  setLedger('condition', '待生成', 'orange', '<span class="ledger-placeholder">推翻条件将在审议中生成</span>');
-  setLedger('evidence', '准备建立', 'blue', '<span class="ledger-placeholder">证据席已激活，准备检索</span>');
-  setLedger('source', '公开资料', 'green', '公开资料 + 内部资料');
-  setLedger('decision', '待归档', 'purple', '<span class="ledger-placeholder">审议完成后自动归档</span>');
-}
+      state.mode = mode;
+      $$('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-function updateLedgerDuring() {
-  setLedger('evidence', '收集中', 'blue',
-    `公开资料 12 条｜内部材料 4 条｜待验证 5 项
-    <div class="evidence-bar"><div class="evidence-bar-fill" id="evidenceBarFill"></div></div>
-    <div class="evidence-counts">
-      <span class="evidence-count-item"><span class="count-dot blue"></span>公开 12</span>
-      <span class="evidence-count-item"><span class="count-dot orange"></span>内部 4</span>
-      <span class="evidence-count-item"><span class="count-dot red"></span>待验证 5</span>
-    </div>`
-  );
-  setTimeout(() => {
-    const f = $('evidenceBarFill');
-    if (f) f.style.width = '72%';
-  }, 100);
-}
+      if (mode === 'auto') {
+        // Switch to auto: clear manual selections
+        state.selectedAgents.clear();
+        $$('.agent-node').forEach(n => n.classList.remove('selected'));
+        $('selectedCount').style.display = 'none';
+        updateSelectedCount();
 
-function updateLedgerAfter() {
-  const src = buildSourceText();
-  setLedger('opposition', '冲突发现', 'red',
-    'HKGAI 可能更像政府资助型研发平台，而非可规模化商业公司。'
-  );
-  setLedger('condition', '待确认', 'orange',
-    '若 6–12 个月内无法证明付费客户、续约率与标准化交付能力，则推翻「值得投资」的判断。'
-  );
-  setLedger('source', '完整', 'green', src || '公开资料 + HKGAI BP.pdf + 融资材料库');
-  setLedger('decision', '记录中', 'purple', '本次审议将生成可归档记录');
-}
+        const val = $('chamberInput').value.trim();
+        if (val) {
+          autoRecommend(val);
+        } else {
+          setPageState('typing');
+        }
 
-function buildSourceText() {
-  const parts = ['公开资料'];
-  state.uploadedFiles.forEach(f => parts.push(f));
-  state.selectedKBs.filter(k => k !== '公开资料库').forEach(k => parts.push(k));
-  return parts.length > 1 ? parts.join(' + ') : '';
-}
+        // Remove manual click handlers
+        $$('.agent-node').forEach(n => {
+          n.removeEventListener('click', handleManualNodeClick);
+        });
 
-// ===== Drawer =====
-function buildExpertList() {
-  const list = $('expertList');
-  list.innerHTML = '';
-  EXPERT_SEATS.forEach(expert => {
-    const seatId = expert.seatId || expert.id;
-    const item = document.createElement('label');
-    item.className = 'expert-item';
-    item.innerHTML = `
-      <input type="checkbox" class="expert-checkbox" data-seat="${seatId}">
-      <div class="expert-info">
-        <div class="expert-name">${expert.name}</div>
-        <div class="expert-role">${expert.role}</div>
-      </div>
-    `;
-    const cb = item.querySelector('input');
-    cb.addEventListener('change', () => {
-      item.classList.toggle('checked', cb.checked);
-      if (cb.checked) activateSeat(seatId);
-      else deactivateSeat(seatId);
-      updateDrawerCount();
+      } else {
+        // Switch to manual
+        state.recommendedAgents.clear();
+        $$('.agent-node').forEach(n => n.classList.remove('recommended'));
+        $('selectedCount').style.display = 'flex';
+        updateSelectedCount();
+        setPageState('manual');
+
+        // Add manual click handlers
+        $$('.agent-node').forEach(n => {
+          n.addEventListener('click', handleManualNodeClick);
+        });
+
+        showToast('手动模式：点击专家节点选择参与审议的专家');
+      }
     });
-    list.appendChild(item);
-  });
-  updateDrawerCount();
-}
-
-function updateDrawerCount() {
-  const n = $$('.expert-checkbox:checked').length;
-  $('drawerCount').textContent = n + CORE_SEATS.length;
-}
-
-function openDrawer() {
-  $('drawerOverlay').classList.add('show');
-  $('manualDrawer').classList.add('open');
-}
-
-function closeDrawer() {
-  $('drawerOverlay').classList.remove('show');
-  $('manualDrawer').classList.remove('open');
-}
-
-function initDrawer() {
-  $('drawerOverlay').addEventListener('click', closeDrawer);
-  $('drawerClose').addEventListener('click', closeDrawer);
-  $('confirmGroupBtn').addEventListener('click', () => {
-    const n = $$('.expert-checkbox:checked').length + CORE_SEATS.length;
-    closeDrawer();
-    showToast(`已确认编组 ${n} 个审议席位`, 'blue');
-    drawConnections();
   });
 }
 
-// ===== Modals =====
+function handleManualNodeClick(e) {
+  if (state.mode !== 'manual') return;
+  e.stopPropagation();
+
+  const node = e.currentTarget;
+  const id = node.dataset.id;
+
+  if (state.selectedAgents.has(id)) {
+    state.selectedAgents.delete(id);
+    node.classList.remove('selected');
+  } else {
+    state.selectedAgents.add(id);
+    node.classList.add('selected');
+  }
+
+  updateSelectedCount();
+  drawSelectedLines();
+}
+
+function updateSelectedCount() {
+  const num = state.selectedAgents.size;
+  $('selectedNum').textContent = num;
+}
+
+// ── Depth Dropdown ─────────────────────────────────────────
+function initDepthDropdown() {
+  $('depthBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    $('depthDropdown').classList.toggle('show');
+  });
+
+  $$('.depth-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      $$('.depth-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      state.depth = opt.dataset.value;
+      $('depthLabel').textContent = opt.querySelector('.depth-name').textContent;
+      $('depthDropdown').classList.remove('show');
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.depth-wrapper')) {
+      $('depthDropdown').classList.remove('show');
+    }
+  });
+}
+
+// ── Start Button ───────────────────────────────────────────
+function initStartBtn() {
+  $('startBtn').addEventListener('click', () => {
+    const val = $('chamberInput').value.trim();
+    if (!val) {
+      showToast('请先输入你的问题');
+      $('chamberInput').focus();
+      return;
+    }
+
+    const activeExperts = state.mode === 'auto'
+      ? [...state.recommendedAgents]
+      : [...state.selectedAgents];
+
+    if (activeExperts.length === 0) {
+      showToast('请先选择参与审议的专家');
+      return;
+    }
+
+    setPageState('launching');
+  });
+}
+
+function triggerLaunch() {
+  const btn = $('startBtn');
+  btn.classList.add('launching');
+  btn.innerHTML = `
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+    审议中…
+  `;
+
+  // Converge animation: all active nodes pulse toward center
+  const activeIds = state.mode === 'auto'
+    ? [...state.recommendedAgents]
+    : [...state.selectedAgents];
+
+  const svg = $('flowLinesSvg');
+  const cc = getChamberCenter();
+
+  activeIds.forEach((id, i) => {
+    setTimeout(() => {
+      const pa = getAgentCenter(id);
+      if (!pa) return;
+      // Multiple pulses converging
+      for (let k = 0; k < 3; k++) {
+        setTimeout(() => animatePulse(svg, pa, cc), k * 200);
+      }
+    }, i * 150);
+  });
+
+  // After animation, show toast and reset
+  setTimeout(() => {
+    showToast('审议已启动，正在召集专家…', 3000);
+    setTimeout(() => {
+      btn.classList.remove('launching');
+      btn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        开始审议
+      `;
+      // Reset to idle
+      $('chamberInput').value = '';
+      clearAllHighlights();
+      setPageState('idle');
+    }, 3200);
+  }, activeIds.length * 150 + 800);
+}
+
+// ── Modals ─────────────────────────────────────────────────
+function initModals() {
+  // Knowledge
+  $('knowledgeBtn').addEventListener('click', () => openModal('knowledge'));
+  $('knowledgeClose').addEventListener('click', () => closeModal('knowledge'));
+  $('knowledgeOverlay').addEventListener('click', () => closeModal('knowledge'));
+  $('confirmKbBtn').addEventListener('click', () => {
+    const selected = [...$$('.kb-checkbox:checked')].map(c => c.value);
+    showToast(`已选择知识库：${selected.join('、') || '无'}`);
+    closeModal('knowledge');
+  });
+
+  // Upload
+  $('uploadBtn').addEventListener('click', () => openModal('upload'));
+  $('uploadClose').addEventListener('click', () => closeModal('upload'));
+  $('uploadOverlay').addEventListener('click', () => closeModal('upload'));
+
+  $$('.file-add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.closest('.file-item').querySelector('.file-info span').textContent;
+      showToast(`已添加材料：${name}`);
+      btn.textContent = '已添加';
+      btn.style.color = 'var(--accent-blue)';
+      btn.style.borderColor = 'rgba(59,130,246,0.3)';
+    });
+  });
+}
+
 function openModal(type) {
   $(`${type}Overlay`).classList.add('show');
   $(`${type}Panel`).classList.add('show');
@@ -439,84 +741,3 @@ function closeModal(type) {
   $(`${type}Overlay`).classList.remove('show');
   $(`${type}Panel`).classList.remove('show');
 }
-
-function initModals() {
-  // Upload
-  $('uploadOverlay').addEventListener('click', () => closeModal('upload'));
-  $('uploadClose').addEventListener('click', () => closeModal('upload'));
-
-  $$('.file-add-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const file = btn.dataset.file;
-      if (!state.uploadedFiles.includes(file)) {
-        state.uploadedFiles.push(file);
-        btn.textContent = '已添加';
-        btn.classList.add('added');
-        updateSourceDisplay();
-        syncLedgerSource();
-        showToast(`已添加：${file}`);
-      }
-    });
-  });
-
-  // Knowledge
-  $('knowledgeOverlay').addEventListener('click', () => closeModal('knowledge'));
-  $('knowledgeClose').addEventListener('click', () => closeModal('knowledge'));
-
-  $('confirmKbBtn').addEventListener('click', () => {
-    state.selectedKBs = Array.from($$('.kb-checkbox:checked')).map(c => c.value);
-    updateSourceDisplay();
-    syncLedgerSource();
-    closeModal('knowledge');
-    showToast(`已指定 ${state.selectedKBs.length} 个知识库`);
-  });
-}
-
-function updateSourceDisplay() {
-  const parts = [];
-  if (state.uploadedFiles.length > 0) {
-    parts.push('公开资料 + ' + state.uploadedFiles.join(' + '));
-  }
-  const kbs = state.selectedKBs.filter(k => k !== '公开资料库');
-  if (kbs.length > 0) {
-    if (!parts.length) parts.push('公开资料');
-    parts.push('指定知识库：' + kbs.join(' / '));
-  }
-
-  const si = $('sourceInfo');
-  if (parts.length) {
-    $('sourceContent').textContent = parts.join(' · ');
-    si.style.display = 'flex';
-  } else {
-    si.style.display = 'none';
-  }
-}
-
-function syncLedgerSource() {
-  const txt = buildSourceText();
-  if (txt) setLedger('source', '完整', 'green', txt);
-}
-
-// ===== Toast =====
-function showToast(msg, type = '') {
-  const t = $('toast');
-  t.className = 'toast' + (type ? ' ' + type : '');
-  t.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>${msg}`;
-  t.classList.add('show');
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// ===== Seat click info =====
-document.addEventListener('DOMContentLoaded', () => {
-  $$('.seat').forEach(seat => {
-    seat.addEventListener('click', e => {
-      const name = seat.querySelector('.seat-name')?.textContent;
-      const desc = seat.querySelector('.seat-desc')?.textContent;
-      const isInactive = seat.classList.contains('inactive');
-      if (isInactive) {
-        showToast(`${name}：${desc}（未激活）`);
-      }
-    });
-  });
-});
